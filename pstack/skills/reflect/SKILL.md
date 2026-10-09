@@ -26,6 +26,8 @@ Three transcript layouts: legacy flat (`<id>.jsonl`), current nested (`<id>/<id>
 
 For each candidate, read the first JSONL line and check that `message.content[0].text` contains the conversation's opening user prompt. Take the matching path. If no path resolves, write a tight digest of the session and pass that instead.
 
+For a reflection that covers several sessions, locate each session record. Label each finding as transcript-backed, artifact-reconstructed, or unknown. An unavailable transcript does not establish what an agent read, decided, or ignored.
+
 ### 2. Spawn three reviewers in parallel
 
 One message, three `Task` calls, `subagent_type: generalPurpose`, with `model` set as below, agent mode (`readonly: false`). Reviewers need MCP access for context lookups (tickets, chat threads, observability traces referenced in the transcript). Readonly strips MCPs.
@@ -43,6 +45,8 @@ Pass each template verbatim, substituting the transcript path or digest where ma
 ### 3. Synthesize
 
 One `Task` call, `subagent_type: generalPurpose`, with `model` from the `reflect judgment, divergent, synthesizer` line (default `claude-opus-5-5-max`), agent mode (`readonly: false`). The synthesizer's quality check includes spot-verifying citations, which can require MCP access. Readonly strips MCPs. Use `references/synthesizer.md` verbatim, with each reviewer's full output inlined where marked. The synthesizer returns a structured Accepted / Rejected / Backlog list.
+
+Record the successful and failed reviewer lanes. State when all successful reviews used one provider. Different lenses on one provider are not cross-provider consensus.
 
 ### 4. Structural enforcement check
 
